@@ -1,9 +1,9 @@
 from django.conf.urls import include
 from django.urls import path
+from recipes.views import IngredientViewSet, RecipeViewSet, TagViewSet
 from rest_framework.routers import DefaultRouter
 
-from .views import (GetRecipeLink, IngredientViewSet,
-                    RecipeViewSet, TagViewSet)
+from .views import GetRecipeLink
 
 router = DefaultRouter()
 router.register('ingredients', IngredientViewSet)
