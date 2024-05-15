@@ -96,7 +96,7 @@ jobs:
             sudo docker compose up -d
             sudo docker compose exec backend python foodgram/manage.py migrate
             sudo docker compose exec backend python foodgram/manage.py collectstatic
-            sudo docker compose exec backend cp -r /app/collected_static/. /backend_static/static/
+            sudo docker compose exec backend cp -r /app/collected_static/. /var/html/backend_static/
   
   send_message:
     runs-on: ubuntu-latest
