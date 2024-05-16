@@ -9,7 +9,7 @@ from recipes.models import Ingredient
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        file_path = settings.BASE_DIR / 'data/ingredients.csv'
+        file_path = settings.BASE_DIR / '/foodgram/data/ingredients.csv'
         with open(file_path, 'r', encoding='utf-8') as f:
             try:
                 Ingredient.objects.bulk_create(
