@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def import_ingredients(self):
         # Ingredient.objects.all().delete()
-        file_path = '../data/ingredients.csv'
+        file_path = 'backend/data/ingredients.csv'
 
         with open(file_path, 'r', encoding='utf-8') as csv_file:
             reader = csv.reader(csv_file)
