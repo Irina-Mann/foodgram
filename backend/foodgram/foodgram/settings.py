@@ -18,6 +18,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,foodyam.zapto.org').split(',')
 
 
@@ -71,6 +72,7 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
