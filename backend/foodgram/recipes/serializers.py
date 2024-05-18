@@ -121,28 +121,20 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         if not ingredients:
             raise ValidationError(
                 {'ingredients': 'Нужно выбрать ингредиент!'})
-        ingredient_names = [item['id'] for item in ingredients]
-        ingredients_queryset = Ingredient.objects.filter(
-            name__in=ingredient_names
-        )
-        ingredients_dict = {
-            ingredient.name: ingredient for ingredient in ingredients_queryset
-        }
-        ingredients_list = []
+        ingredient_unic = []
         for item in ingredients:
             ingredient_name = item['id']
-            ingredient = ingredients_dict.get(ingredient_name)
-            if not ingredient:
+            if not ingredient_name:
                 raise ValidationError(
                     {'ingredients': f'Ингредиент {ingredient_name} не найден!'}
                 )
-            if ingredient in ingredients_list:
+            if ingredient_name in ingredient_unic:
                 raise ValidationError(
                     {'ingredients': 'Ингридиенты повторяются!'})
             if int(item['amount']) <= 0:
                 raise ValidationError(
                     {'amount': 'Количество должно быть больше 0!'})
-            ingredients_list.append(ingredient)
+            ingredient_unic.append(ingredient_name)
         return value
 
     def validate_tags(self, value):
