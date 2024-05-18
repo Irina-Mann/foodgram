@@ -60,6 +60,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         user=user,
                         recipe=OuterRef('pk')))
                 )
+        return queryset
 
     def perform_create(self, serializer):
         """Присваемваем автора при создании рецепта"""
