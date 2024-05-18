@@ -162,11 +162,12 @@ class GetRecipeLink(APIView):
 
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        short_url = generate_short_url()
-        link_obj, _ = Link.objects.get_or_create(
-            recipe=recipe,
-            defaults={'original_url': recipe.get_absolute_url(),
-                      'short_link': short_url})
+        link_obj, create = Link.objects.get_or_create(recipe=recipe)
+        if create:
+            link_obj.short_link = generate_short_url()
+            link_obj.save()
+        else:
+            pass
         serializer = LinkSerializer(link_obj)
         return Response(serializer.data)
 

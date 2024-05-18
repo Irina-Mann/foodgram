@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.db import transaction
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
@@ -121,9 +121,21 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         if not ingredients:
             raise ValidationError(
                 {'ingredients': 'Нужно выбрать ингредиент!'})
+        ingredient_names = [item['id'] for item in ingredients]
+        ingredients_queryset = Ingredient.objects.filter(
+            name__in=ingredient_names
+        )
+        ingredients_dict = {
+            ingredient.name: ingredient for ingredient in ingredients_queryset
+        }
         ingredients_list = []
         for item in ingredients:
-            ingredient = get_object_or_404(Ingredient, name=item['id'])
+            ingredient_name = item['id']
+            ingredient = ingredients_dict.get(ingredient_name)
+            if not ingredient:
+                raise ValidationError(
+                    {'ingredients': f'Ингредиент {ingredient_name} не найден!'}
+                )
             if ingredient in ingredients_list:
                 raise ValidationError(
                     {'ingredients': 'Ингридиенты повторяются!'})
@@ -147,13 +159,18 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         return value
 
     def add_tags_ingredients(self, ingredients, tags, model):
+        RecipeIngredients.objects.filter(recipe=model).delete()
+        new_ingredients = []
         for ingredient in ingredients:
-            RecipeIngredients.objects.update_or_create(
+            new_ingredients.append(RecipeIngredients(
                 recipe=model,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount'])
+            )
+        RecipeIngredients.objects.bulk_create(new_ingredients)
         model.tags.set(tags)
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -161,6 +178,7 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         self.add_tags_ingredients(ingredients, tags, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if 'ingredients' not in validated_data or 'tags' not in validated_data:
             raise ValidationError(
