@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from users.serializers import UserSerializer
 
 from .models import (Favorite, Ingredient, Link, Recipe, RecipeIngredients,
-                     ShoppingCart, Tag)
+                     Tag)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -60,8 +60,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='ingredient_in_recipe',
         read_only=True)
     author = UserSerializer(read_only=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.BooleanField(default=False, read_only=True)
+    is_in_shopping_cart = serializers.BooleanField(
+        default=False,
+        read_only=True
+    )
     image = Base64ImageField()
 
     class Meta:
@@ -77,20 +80,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'text',
                   'cooking_time'
                   )
-
-    def get_is_favorited(self, obj):
-        """Функция проверяет - находится ли рецепт в избранном"""
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Favorite.objects.filter(user=user, recipe=obj).exists()
-
-    def get_is_in_shopping_cart(self, obj):
-        """Функция проверяет - находится ли рецепт в списке покупок"""
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
 
 
 class RecipeCUDSerializer(serializers.ModelSerializer):

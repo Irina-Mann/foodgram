@@ -2,7 +2,7 @@ import random
 import string
 
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Exists, OuterRef, Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
@@ -35,7 +35,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Работа с рецептами"""
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().prefetch_related('author', 'ingredients')
     permission_classes = (IsAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -46,6 +46,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return RecipeSerializer
         return RecipeCUDSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        if user.is_authenticated:
+            queryset = queryset.annotate(
+                is_favorited=Exists(Favorite.objects.filter(
+                    user=user,
+                    recipe=OuterRef('pk'))),
+                is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                    user=user,
+                    recipe=OuterRef('pk')))
+            )
+        else:
+            queryset = queryset.annotate(is_favorited=False,
+                                         is_in_shopping_cart=False)
 
     def perform_create(self, serializer):
         """Присваемваем автора при создании рецепта"""
@@ -164,9 +180,8 @@ class GetRecipeLink(APIView):
         link_obj, create = Link.objects.get_or_create(recipe=recipe)
         if create:
             link_obj.short_link = generate_short_url()
+            link_obj.original_url = recipe.get_absolute_url()
             link_obj.save()
-        else:
-            pass
         serializer = LinkSerializer(link_obj)
         return Response(serializer.data)
 
