@@ -50,18 +50,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = super().get_queryset()
-        if user.is_authenticated:
-            queryset = queryset.annotate(
-                is_favorited=Exists(Favorite.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk'))),
-                is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk')))
-            )
-        else:
-            queryset = queryset.annotate(is_favorited=False,
-                                         is_in_shopping_cart=False)
+        if self.action in ['list', 'retrieve']:
+            if user.is_authenticated:
+                queryset = queryset.annotate(
+                    is_favorited=Exists(Favorite.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk'))),
+                    is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk')))
+                )
 
     def perform_create(self, serializer):
         """Присваемваем автора при создании рецепта"""
