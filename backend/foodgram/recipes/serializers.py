@@ -154,7 +154,7 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         RecipeIngredients.objects.bulk_create(
             RecipeIngredients(
                 recipe=model,
-                ingredient=ingredient['ingredient'],
+                ingredient=ingredients['ingredient'],
                 amount=ingredient['amount'],
             )
             for ingredient in ingredients
