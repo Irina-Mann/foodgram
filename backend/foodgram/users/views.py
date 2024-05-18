@@ -9,13 +9,13 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 
 from .models import Subscription, User
-from .serializers import (AvatarSerializer, MyUserSerializer,
+from .serializers import (AvatarSerializer, UserSerializer,
                           SubscribSerializer, SubscriptionSerializer)
 
 
 class MyUserViewSet(UserViewSet):
     queryset = User.objects.all()
-    serializer_class = MyUserSerializer
+    serializer_class = UserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = RecipePagination
 
@@ -25,7 +25,7 @@ class MyUserViewSet(UserViewSet):
     def me(self, request):
         """Кастомное получение профиля пользователя."""
         user = self.request.user
-        serializer = MyUserSerializer(user, context={'request': request})
+        serializer = UserSerializer(user, context={'request': request})
         return Response(serializer.data)
 
     @action(

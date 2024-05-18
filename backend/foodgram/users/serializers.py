@@ -1,9 +1,10 @@
-import recipes
-from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import Recipe
-from recipes.utils import Base64ImageField
+from djoser.serializers import (UserCreateSerializer,
+                                UserSerializer as DjoserUserSerialiser)
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
+import recipes
+from recipes.models import Recipe
 from .models import Subscription, User
 
 
@@ -16,7 +17,7 @@ class UserSignUpSerializer(UserCreateSerializer):
                   'last_name', 'password')
 
 
-class MyUserSerializer(UserSerializer):
+class UserSerializer(DjoserUserSerialiser):
     """Сериализатор для модели User"""
     is_subscribed = serializers.SerializerMethodField()
     avatar = Base64ImageField(allow_null=True, required=False)

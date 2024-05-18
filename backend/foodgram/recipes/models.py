@@ -6,11 +6,14 @@ from users.models import User
 
 
 class Ingredient(models.Model):
-    """Модель для ингредиентов"""
-    name = models.CharField('Название',
-                            max_length=200)
-    measurement_unit = models.CharField('Единица измерения',
-                                        max_length=200)
+    name = models.CharField(
+        'Название',
+        max_length=200
+    )
+    measurement_unit = models.CharField(
+        'Единица измерения',
+        max_length=200
+    )
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -21,12 +24,15 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    """Теги для рецептов"""
-    name = models.CharField('Название',
-                            max_length=200,
-                            unique=True)
-    slug = models.SlugField('Slug',
-                            unique=True)
+    name = models.CharField(
+        'Название',
+        max_length=200,
+        unique=True
+    )
+    slug = models.SlugField(
+        'Slug',
+        unique=True
+    )
 
     class Meta:
         verbose_name = 'Тег'
@@ -37,7 +43,6 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    """Модель для создания рецепта"""
     author = models.ForeignKey(
         User,
         verbose_name='Автор рецепта',

@@ -1,18 +1,5 @@
-import base64
-
 from django.conf import settings
-from django.core.files.base import ContentFile
-from django.http import HttpResponse
-from rest_framework import serializers
-
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        return super().to_internal_value(data)
+from django.http import FileResponse
 
 
 def shopping_txt(shop_list):
@@ -25,7 +12,10 @@ def shopping_txt(shop_list):
         lines.append(f'{name} ({measurement_unit}) - {amount}')
     lines.append('\nFoodGram 2024')
     content = '\n'.join(lines)
-    content_type = 'text/plain,charset=utf8'
-    response = HttpResponse(content, content_type=content_type)
-    response['Content-Disposition'] = f'attachment; filename={file_name}'
+    file_path = f'/tmp/{file_name}'
+    with open(file_path, 'w') as file:
+        file.write(content)
+    response = FileResponse(open(file_path, 'rb'),
+                            as_attachment=True,
+                            filename=file_name)
     return response

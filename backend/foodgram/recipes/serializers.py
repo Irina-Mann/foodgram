@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
-from users.serializers import MyUserSerializer
+from users.serializers import UserSerializer
 
 from .models import (Favorite, Ingredient, Link, Recipe, RecipeIngredients,
                      ShoppingCart, Tag)
-from .utils import Base64ImageField
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -59,7 +59,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True,
         source='ingredient_in_recipe',
         read_only=True)
-    author = MyUserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
