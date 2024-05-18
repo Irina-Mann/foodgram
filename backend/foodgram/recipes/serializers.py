@@ -161,10 +161,12 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
     def add_tags_ingredients(self, ingredients, tags, model):
         RecipeIngredients.objects.filter(recipe=model).delete()
         new_ingredients = []
-        for ingredient in ingredients:
+        for ingredient_data in ingredients:
+            ingredient_id = ingredient_data['id']
+            ingredient = Ingredient.objects.get(id=ingredient_id)
             new_ingredients.append(RecipeIngredients(
                 recipe=model,
-                ingredient=ingredient['id'],
+                ingredient=ingredient,
                 amount=ingredient['amount'])
             )
         RecipeIngredients.objects.bulk_create(new_ingredients)

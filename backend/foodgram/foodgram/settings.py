@@ -177,3 +177,4 @@ COOK_TIME = 1
 SHOPPING_CART = 'shopping_list.txt'
 
 CSRF_TRUSTED_ORIGINS = ["https://foodyam.zapto.org"]
+DOMEN = 'foodyam.zapto.org'

@@ -1,6 +1,7 @@
 import random
 import string
 
+from django.conf import settings
 from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -72,22 +73,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            try:
-                recipe = get_object_or_404(Recipe, id=pk)
-            except Http404:
-                return Response(
-                    'Рецепт не найден',
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            obj = Favorite.objects.filter(user=user, recipe=recipe)
-            if obj.exists():
-                obj.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            recipe = get_object_or_404(Recipe, id=pk)
+        except Http404:
             return Response(
-                'Рецепт отсутствует в избранном',
-                status=status.HTTP_400_BAD_REQUEST
+                'Рецепт не найден',
+                status=status.HTTP_404_NOT_FOUND
             )
+        obj = Favorite.objects.filter(user=user, recipe=recipe)
+        if obj.exists():
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            'Рецепт отсутствует в избранном',
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         detail=True,
@@ -111,22 +111,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = ShortRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            try:
-                recipe = get_object_or_404(Recipe, id=pk)
-            except Http404:
-                return Response(
-                    'Рецепт не найден',
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            obj = ShoppingCart.objects.filter(user=user, recipe=recipe)
-            if obj.exists():
-                obj.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            recipe = get_object_or_404(Recipe, id=pk)
+        except Http404:
             return Response(
-                'Рецепт отсутствует в списке покупок',
-                status=status.HTTP_400_BAD_REQUEST
+                'Рецепт не найден',
+                status=status.HTTP_404_NOT_FOUND
             )
+        obj = ShoppingCart.objects.filter(user=user, recipe=recipe)
+        if obj.exists():
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            'Рецепт отсутствует в списке покупок',
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         detail=False,
@@ -154,7 +153,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 def generate_short_url():
     characters = string.ascii_letters + string.digits
     short_url = ''.join(random.choices(characters, k=4))
-    return "http://foodyam.zapto.org/s/" + short_url
+    return f"http://{settings.DOMEN}/s/" + short_url
 
 
 class GetRecipeLink(APIView):
@@ -175,7 +174,7 @@ class GetRecipeLink(APIView):
 def redirect_to_full_link(request, short_link):
     try:
         link_obj = Link.objects.get(
-            short_link='http://foodyam.zapto.org/s/' + short_link
+            short_link=f'http://{settings.DOMEN}/s/' + short_link
         )
         full_link = link_obj.original_url.replace('/api', '', 1)
         return redirect(full_link)
