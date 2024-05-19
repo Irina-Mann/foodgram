@@ -54,10 +54,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if user.is_authenticated:
                 queryset = queryset.annotate(
                     is_favorited=Exists(Favorite.objects.filter(
-                        user=user,
+                        user_id=user.id,
                         recipe=OuterRef('pk'))),
                     is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                        user=user,
+                        user_id=user.id,
                         recipe=OuterRef('pk')))
                 )
         return queryset
@@ -190,7 +190,7 @@ def redirect_to_full_link(request, short_link):
         link_obj = Link.objects.get(
             short_link=f'http://{settings.DOMEN}/s/' + short_link
         )
-        full_link = link_obj.original_url.replace('/api', '', 1)
+        full_link = link_obj.original_url.replace('/api', '', 1)[:-1]
         return redirect(full_link)
     except Link.DoesNotExist:
         return HttpResponse('Link not found', status=404)
