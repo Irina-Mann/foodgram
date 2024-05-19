@@ -70,7 +70,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         if request.method == 'POST':
             try:
-                recipe = get_object_or_404(Recipe, pk)
+                recipe = get_object_or_404(Recipe, id=pk)
             except Http404:
                 return Response('Рецепт не найден',
                                 status=status.HTTP_400_BAD_REQUEST)
