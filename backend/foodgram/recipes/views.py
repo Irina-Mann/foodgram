@@ -35,7 +35,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Работа с рецептами"""
-    queryset = Recipe.objects.all().prefetch_related('author', 'ingredients')
     permission_classes = (IsAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -49,17 +48,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = super().get_queryset()
-        if self.action in ['list', 'retrieve']:
-            if user.is_authenticated:
-                queryset = queryset.annotate(
-                    is_favorited=Exists(Favorite.objects.filter(
-                        user_id=user.id,
-                        recipe=OuterRef('pk'))),
-                    is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                        user_id=user.id,
-                        recipe=OuterRef('pk')))
-                )
+        queryset = Recipe.objects.all().prefetch_related(
+            'author', 'ingredients')
+        if self.action in ['list', 'retrieve'] and user.is_authenticated:
+            queryset = queryset.annotate(
+                is_favorited=Exists(Favorite.objects.filter(
+                    user_id=user.id,
+                    recipe=OuterRef('pk'))),
+                is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                    user_id=user.id,
+                    recipe=OuterRef('pk')))
+            )
         return queryset
 
     def perform_create(self, serializer):
