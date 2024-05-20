@@ -6,9 +6,9 @@ from recipes.views import (GetRecipeLink, IngredientViewSet, RecipeViewSet,
                            TagViewSet)
 
 router = DefaultRouter()
-router.register('ingredients', IngredientViewSet)
-router.register('tags', TagViewSet)
-router.register('recipes', RecipeViewSet)
+router.register('ingredients', IngredientViewSet, 'ingredient')
+router.register('tags', TagViewSet, 'tag')
+router.register('recipes', RecipeViewSet, 'recipe')
 
 urlpatterns = [
     path('recipes/<int:recipe_id>/get-link/', GetRecipeLink.as_view()),
