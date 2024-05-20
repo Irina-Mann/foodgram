@@ -8,11 +8,11 @@ from users.models import User
 class Ingredient(models.Model):
     name = models.CharField(
         'Название',
-        max_length=200
+        max_length=settings.MAX_LTH
     )
     measurement_unit = models.CharField(
         'Единица измерения',
-        max_length=200
+        max_length=settings.MAX_LTH
     )
 
     class Meta:
@@ -26,7 +26,7 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         'Название',
-        max_length=200,
+        max_length=settings.MAX_LTH,
         unique=True
     )
     slug = models.SlugField(
@@ -51,7 +51,7 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=settings.MAX_LTH
     )
     image = models.ImageField(
         'Фотография к рецепту',
@@ -184,7 +184,7 @@ class Link(models.Model):
     )
     original_url = models.URLField('Полная ссылка')
     short_link = models.CharField('Короткая ссылка',
-                                  max_length=50,
+                                  max_length=settings.MAX_LTH,
                                   unique=True
                                   )
 

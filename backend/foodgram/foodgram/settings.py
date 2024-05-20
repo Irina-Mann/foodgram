@@ -127,11 +127,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = Path(BASE_DIR) / 'backend_static'
+STATIC_ROOT = BASE_DIR / 'backend_static'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = Path(BASE_DIR) / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -179,3 +179,4 @@ SHOPPING_CART = 'shopping_list.txt'
 
 CSRF_TRUSTED_ORIGINS = ["https://foodyam.zapto.org"]
 DOMEN = 'foodyam.zapto.org'
+MAX_LTH = 200
