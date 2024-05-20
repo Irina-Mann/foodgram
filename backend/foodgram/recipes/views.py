@@ -2,7 +2,7 @@ import random
 import string
 
 from django.conf import settings
-from django.db.models import Exists, OuterRef, Sum
+from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
@@ -51,14 +51,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all().prefetch_related(
             'author', 'ingredients')
         if self.action in ['list', 'retrieve'] and user.is_authenticated:
-            queryset = queryset.annotate(
-                is_favorited=Exists(Favorite.objects.filter(
-                    user_id=user.id,
-                    recipe=OuterRef('pk'))),
-                is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                    user_id=user.id,
-                    recipe=OuterRef('pk')))
-            )
+            queryset = queryset.annotate_for_shopping_favourite(user)
         return queryset
 
     def perform_create(self, serializer):

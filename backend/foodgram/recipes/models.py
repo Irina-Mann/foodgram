@@ -1,8 +1,22 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Exists, OuterRef
 from rest_framework.reverse import reverse
 from users.models import User
+
+
+class ReсipeQuerySet(models.QuerySet):
+
+    def annotate_for_shopping_favourite(self, user):
+        return self.annotate(
+            is_favorited=Exists(Favorite.objects.filter(
+                user=user,
+                recipe=OuterRef('pk'))),
+            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                user=user,
+                recipe=OuterRef('pk')))
+        )
 
 
 class Ingredient(models.Model):
@@ -81,6 +95,8 @@ class Recipe(models.Model):
         'Дата публикации',
         auto_now_add=True
     )
+
+    objects = ReсipeQuerySet.as_manager()
 
     class Meta:
         ordering = ('-pub_date',)
