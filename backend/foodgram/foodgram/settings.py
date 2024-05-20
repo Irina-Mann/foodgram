@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-#DEBUG = os.getenv('DEBUG') == 'True'
+# DEBUG = os.getenv('DEBUG') == 'True'
 
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,foodyam.zapto.org').split(',')
