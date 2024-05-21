@@ -139,6 +139,13 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
             tags_list.append(tag)
         return value
 
+    def validate_cooking_time(self, data):
+        if data <= 0:
+            raise serializers.ValidationError(
+                'Время приготовления не может быть меньше 1 минуты'
+            )
+        return data
+
     def add_tags_ingredients(self, ingredients, tags, model):
         recipe_ingredients = []
         for ingredient in ingredients:
